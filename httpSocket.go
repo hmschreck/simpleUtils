@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 )
@@ -15,12 +15,19 @@ func main() {
 		os.Exit(1)
 	}
 	HTTPCall := os.Args[2]
+	fmt.Println(HTTPCall)
 	conn, err := net.Dial("unix", SocketPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not create connection to socket")
 		os.Exit(2)
 	}
-	fmt.Fprintf(conn, HTTPCall)
-	response, err := bufio.NewReader(conn).ReadString('\n')
-	fmt.Print(response)
+	fmt.Fprintf(conn, "%s\r\n\r\n", HTTPCall)
+	// response, err := bufio.NewReader(conn).ReadString('\n')
+	//if err != nil {
+	//	fmt.Println("I died.")
+	//}
+
+	output, err := ioutil.ReadAll(conn)
+	finalOutput := fmt.Sprintf("%s", output)
+	fmt.Print(finalOutput)
 }
